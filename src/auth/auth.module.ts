@@ -1,14 +1,9 @@
 import { Module } from '@nestjs/common';
-import { DoctorStrategy } from './strategies/doctor.strategy';
-import { UserStrategy } from './strategies/user.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
     providers: [
-        DoctorStrategy,
-        UserStrategy
-    ],
+        JwtStrategy
+    ]
 })
 export class AuthModule { }
-
-
-

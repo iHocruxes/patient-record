@@ -12,8 +12,8 @@ async function bootstrap() {
   app.setGlobalPrefix(process.env.SERVER_NAME)
   //Swagger
   const config = new DocumentBuilder()
-    .setTitle('DOCTOR MANAGEMENT')
-    .setDescription('Microservice dùng để quản lí hồ sơ người dùng')
+    .setTitle('PATIENT RECORD')
+    .setDescription('Microservice dùng để quản lí hồ sơ bệnh án người dùng')
     .setVersion('1.0')
     .setContact('White Hat', '', 'truonggolang@gmail.com')
     .addBearerAuth()
