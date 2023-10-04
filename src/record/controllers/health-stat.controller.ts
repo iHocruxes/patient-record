@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { HealthStatService } from "../services/health-stat.service";
-import { JwtGuard } from "src/auth/guards/jwt.guard";
+import { JwtGuard } from "../../auth/guards/jwt.guard";
 import { HealthStatDto } from "../dtos/health-stat.dto";
 import { HealthStats } from "../../config/enum.constants";
 
