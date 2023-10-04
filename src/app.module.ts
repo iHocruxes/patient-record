@@ -14,6 +14,4 @@ import { RecordModule } from './record/record.module';
     RecordModule
   ],
 })
-export class AppModule {
-  
- }
+export class AppModule { }
