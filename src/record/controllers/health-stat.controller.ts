@@ -14,7 +14,7 @@ export class HealthStatController {
     ) { }
 
     @UseGuards(JwtGuard)
-    @ApiOperation({ summary: 'Cập nhật chỉ số sức khỏe của bệnh nhân', description: 'Cập nhật các chỉ số để bác sĩ có thể theo dõi' })
+    @ApiOperation({ summary: 'Cập nhật chỉ số sức khỏe của bệnh nhân', description: 'Thêm các chỉ số nếu chưa có hoặc cập nhật các chỉ số để bác sĩ có thể theo dõi' })
     @ApiParam({ name: 'type', enum: HealthStats, required: false })
     @ApiResponse({ status: 200, description: 'Thành công' })
     @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ' })
