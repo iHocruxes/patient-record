@@ -10,7 +10,6 @@ export class PatientRecordController {
     constructor(
         private readonly patientRecordService: PatientRecordService
     ) { }
-
     // @UseGuards(JwtGuard)
     // @ApiOperation({ summary: 'Cập nhật chỉ số sức khỏe của bệnh nhân', description: 'Cập nhật các chỉ số để bác sĩ có thể theo dõi' })
     // @ApiResponse({ status: 200, description: 'Thành công' })
