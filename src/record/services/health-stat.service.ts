@@ -17,7 +17,7 @@ export class HealthStatService extends BaseService<HealthStat>{
     }
 
     async getMedicalRecord(medicalId: string, userId: string): Promise<MedicalRecord> {
-        const medical = await this.medicalRecordRepository.findOneBy({ 'id': medicalId, 'managerId': userId })
+        const medical = await this.medicalRecordRepository.findOne( { where: { 'id': medicalId, 'managerId': userId }, relations: ['healthStats'] })
 
         if(!medical)
             throw new NotFoundException('Hồ sơ không tồn tại')
@@ -25,17 +25,28 @@ export class HealthStatService extends BaseService<HealthStat>{
         return medical
     }
 
-    async getAllHealthStatOfMedicalRecord(medicalId: string, userId: string): Promise<HealthStat[]> {
-        try {
-            return await this.healthStatRepository.findBy({'medical': { 'id': medicalId, 'managerId': userId }})
-        } catch (error) {
-            throw new InternalServerErrorException('Lỗi máy chủ')
+    async getAllHealthStatOfMedicalRecord(medicalId: string, userId: string): Promise<any> {
+        const stats = (await this.getMedicalRecord(medicalId, userId)).healthStats
+        const data = []
+        stats.forEach(stat => {
+            data.push({
+                id: stat.id,
+                type: stat.health_stat_type,
+                value: stat.value,
+                unit: stat.unit
+            })
+        })
+
+        return {
+            "code": 200,
+            "message": "Success",
+            "data": data
         }
     }
 
     async updateHealthStatInformation(dto: HealthStatDto, userId: string): Promise<any> {
         const medical = await this.getMedicalRecord(dto.medicalId, userId)
-        const stats = await this.getAllHealthStatOfMedicalRecord(dto.medicalId, userId)
+        const stats = medical.healthStats
 
         for(let i = 0; i < dto.stats.length; i++) {
             if(!(dto.stats[i].type in HealthStats))

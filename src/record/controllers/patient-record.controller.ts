@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from "@nestjs/common"
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger"
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger"
 import { JwtGuard } from "../../auth/guards/jwt.guard"
 import { PatientRecordService } from "../services/patient-record.service"
 import { PatientRecordtDto } from "../dtos/patient-record.dto"
@@ -13,6 +13,7 @@ export class PatientRecordController {
     ) { }
 
     @UseGuards(JwtGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Thêm hồ sơ bệnh án của bệnh nhân', description: 'Thêm các hồ sơ để bác sĩ có thể theo dõi' })
     @ApiResponse({ status: 200, description: 'Thành công' })
     @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh nhân' })
@@ -23,6 +24,7 @@ export class PatientRecordController {
     }
 
     @UseGuards(JwtGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Xem các hồ sơ bệnh án bệnh nhân', description: 'Xem các hồ sơ bệnh án bệnh nhân' })
     @ApiResponse({ status: 200, description: 'Thành công' })
     @ApiResponse({ status: 500, description: 'Lỗi máy chủ' })
@@ -32,6 +34,7 @@ export class PatientRecordController {
     }
 
     @UseGuards(JwtGuard)
+    @ApiBearerAuth()
     @ApiOperation({ summary: 'Xóa hồ sơ bệnh án của bệnh nhân', description: 'Xóa hồ sơ bệnh án của bệnh nhận' })
     @ApiResponse({ status: 200, description: 'Thành công' })
     @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })

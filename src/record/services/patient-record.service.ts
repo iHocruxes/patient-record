@@ -17,7 +17,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
     }
 
     async getMedicalRecord(medicalId: string, userId: string): Promise<MedicalRecord> {
-        const medical = await this.medicalRecordRepository.findOneBy({ 'id': medicalId, 'managerId': userId })
+        const medical = await this.medicalRecordRepository.findOne({ where: { 'id': medicalId, 'managerId': userId }, relations: ['patientRecords'] })
 
         if(!medical)
             throw new NotFoundException('Hồ sơ không tồn tại')
@@ -25,11 +25,21 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         return medical
     }
 
-    async getAllPatientRecordOfMedicalRecord(medicalId: string, userId: string): Promise<PatientRecord[]> {
-        try {
-            return await this.patientRecordRepository.findBy({'medical': { 'id': medicalId, 'managerId': userId }})
-        } catch (error) {
-            throw new InternalServerErrorException('Lỗi máy chủ')
+    async getAllPatientRecordOfMedicalRecord(medicalId: string, userId: string): Promise<any> {
+        const records = (await this.getMedicalRecord(medicalId, userId)).patientRecords
+        const data = []
+        records.forEach(record => {
+            data.push({
+                id: record.id,
+                name: record.record,
+                update_at: record.updated_at,
+            })
+        })
+
+        return {
+            "code": 200,
+            "message": "Success",
+            "data": data
         }
     }
 
@@ -49,7 +59,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
         return {
             "code": 201,
-            "message": "Created"
+            "message": "created"
         }
     }
 
@@ -57,7 +67,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         const record = await this.patientRecordRepository.findOne({ where: { id: recordId }, relations: ['medical'] })
         
         if(record.medical.managerId !== userId)
-            throw new UnauthorizedException('Không có quyền truy cập')
+            throw new UnauthorizedException('not have access')
 
         try {
             await this.patientRecordRepository.remove(record)
@@ -67,7 +77,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
         return {
             "code": 200,
-            "message": "Success"
+            "message": "success"
         }
     }
 }
