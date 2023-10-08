@@ -1,15 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from "@nestjs/common"
+import { Body, Controller, Delete, Get, Inject, Param, Post, Req, UseGuards } from "@nestjs/common"
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger"
 import { JwtGuard } from "../../auth/guards/jwt.guard"
 import { PatientRecordService } from "../services/patient-record.service"
 import { PatientRecordtDto } from "../dtos/patient-record.dto"
+import { CACHE_MANAGER } from "@nestjs/cache-manager"
+import { Cache } from "cache-manager";
 
 @ApiTags('Patient Record')
 
 @Controller('record')
 export class PatientRecordController {
     constructor(
-        private readonly patientRecordService: PatientRecordService
+        private readonly patientRecordService: PatientRecordService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
 
     @UseGuards(JwtGuard)
@@ -30,7 +33,14 @@ export class PatientRecordController {
     @ApiResponse({ status: 500, description: 'Lỗi máy chủ' })
     @Get(':medicalId')
     async getAllPatientRecordOfMedicalRecord(@Param('medicalId') medicalId: string, @Req() req): Promise<any> {
-        return await this.patientRecordService.getAllPatientRecordOfMedicalRecord(medicalId, req.user.id)
+        const cacheSchedules = await this.cacheManager.get('patient-record-' + req.user.id);
+        if (cacheSchedules) return cacheSchedules
+
+        const data = await this.patientRecordService.getAllPatientRecordOfMedicalRecord(medicalId, req.user.id)
+
+        await this.cacheManager.set('patient-record-' + req.user.id, data)
+
+        return data
     }
 
     @UseGuards(JwtGuard)

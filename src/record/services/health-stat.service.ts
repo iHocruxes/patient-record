@@ -6,6 +6,7 @@ import { MedicalRecord } from "../entities/medical-record.entity";
 import { Repository } from "typeorm";
 import { HealthStatDto } from "../dtos/health-stat.dto";
 import { HealthStats } from "../../config/enum.constants";
+import { StatDetailDto } from "../dtos/stat-detail.dto";
 
 @Injectable()
 export class HealthStatService extends BaseService<HealthStat>{
@@ -28,19 +29,52 @@ export class HealthStatService extends BaseService<HealthStat>{
     async getAllHealthStatOfMedicalRecord(medicalId: string, userId: string): Promise<any> {
         const stats = (await this.getMedicalRecord(medicalId, userId)).healthStats
         const data = []
+        const data_head_cricumference = []
         stats.forEach(stat => {
-            data.push({
-                id: stat.id,
-                type: stat.health_stat_type,
-                value: stat.value,
-                unit: stat.unit
-            })
+            if(stat.health_stat_type === HealthStats.Head_cricumference){
+                data_head_cricumference.push({
+                    id: stat.id,
+                    value: stat.value,
+                    unit: stat.unit,
+                    updated_at: stat.updated_at
+                })
+            } else {
+                data.push({
+                    id: stat.id,
+                    type: stat.health_stat_type,
+                    value: stat.value,
+                    unit: stat.unit,
+                    updated_at: stat.updated_at
+                })
+            }
         })
+
+        if(data_head_cricumference.length !== 0) {
+            data.push({
+                type:  HealthStats.Head_cricumference,
+                history: data_head_cricumference
+            })
+        }
 
         return {
             "code": 200,
             "message": "Success",
             "data": data
+        }
+    }
+
+    async addStat(dto: StatDetailDto, medical: MedicalRecord) {
+        const stat = new HealthStat()
+        stat.health_stat_type = dto.type
+        stat.medical = medical
+        stat.unit = dto.unit
+        stat.value = dto.value
+        stat.updated_at = this.VNTime()
+
+        try {
+            await this.healthStatRepository.save(stat)
+        } catch (error) {
+            throw new BadRequestException('Chỉnh sửa thất bại')
         }
     }
 
@@ -51,6 +85,11 @@ export class HealthStatService extends BaseService<HealthStat>{
         for(let i = 0; i < dto.stats.length; i++) {
             if(!(dto.stats[i].type in HealthStats))
                 throw new BadRequestException('Sai cú pháp')
+
+            if(dto.stats[i].type === HealthStats.Head_cricumference) {
+                this.addStat(dto.stats[i], medical)
+                continue
+            }
 
             var flag = false
             for(let j = 0; j < stats.length; j++) {
@@ -70,18 +109,7 @@ export class HealthStatService extends BaseService<HealthStat>{
             }
 
             if(flag === false) {
-                const stat = new HealthStat()
-                stat.health_stat_type = dto.stats[i].type
-                stat.medical = medical
-                stat.unit = dto.stats[i].unit
-                stat.value = dto.stats[i].value
-                stat.updated_at = this.VNTime()
-
-                try {
-                    await this.healthStatRepository.save(stat)
-                } catch (error) {
-                    throw new BadRequestException('Chỉnh sửa thất bại')
-                }
+                this.addStat(dto.stats[i], medical)
             }
         }
 

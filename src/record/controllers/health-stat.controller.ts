@@ -1,16 +1,19 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { HealthStatService } from "../services/health-stat.service";
 import { JwtGuard } from "../../auth/guards/jwt.guard";
 import { HealthStatDto } from "../dtos/health-stat.dto";
 import { HealthStats } from "../../config/enum.constants";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @ApiTags('Health Stats')
 
 @Controller('health-stat')
 export class HealthStatController {
     constructor(
-        private readonly healthStatService: HealthStatService
+        private readonly healthStatService: HealthStatService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
 
     @UseGuards(JwtGuard)
@@ -32,6 +35,13 @@ export class HealthStatController {
     @ApiResponse({ status: 500, description: 'Lỗi máy chủ' })
     @Get(':medicalId')
     async getAllHealthStatOfMedicalRecord(@Param('medicalId') medicalId: string, @Req() req): Promise<any> {
-        return await this.healthStatService.getAllHealthStatOfMedicalRecord(medicalId, req.user.id)
+        const cacheSchedules = await this.cacheManager.get('health-stat-' + req.user.id);
+        if (cacheSchedules) return cacheSchedules
+
+        const data = await this.healthStatService.getAllHealthStatOfMedicalRecord(medicalId, req.user.id)
+
+        await this.cacheManager.set('health-stat-' + req.user.id, data)
+
+        return data
     }
 }

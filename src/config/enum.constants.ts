@@ -16,6 +16,6 @@ export enum HealthStats {
     Weight = "Weight",
     Heart_rate = "Heart_rate",
     Temperature = "Temperature",
-    Blood_pressure = "Blood_pressure",
-    Waist_cricumference = "Waist_cricumference"
+    Blood_group = "Blood_group",
+    Head_cricumference = "Head_cricumference"
 }
