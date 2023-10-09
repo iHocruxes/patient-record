@@ -8,7 +8,6 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
 
 @ApiTags('Health Stats')
-
 @Controller('health-stat')
 export class HealthStatController {
     constructor(
