@@ -115,7 +115,7 @@ export class HealthStatService extends BaseService<HealthStat>{
 
         return {
             "code": 200,
-            "message": "Success"
+            "message": "success"
         }
     }
 
