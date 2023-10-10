@@ -1,6 +1,6 @@
 import { BaseService } from "../../config/base.service";
 import { PatientRecord } from "../entities/patient-record.entity";
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MedicalRecord } from "../entities/medical-record.entity";
 import { Repository } from "typeorm";
@@ -20,7 +20,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         const medical = await this.medicalRecordRepository.findOne({ where: { 'id': medicalId, 'managerId': userId }, relations: ['patientRecords'] })
 
         if(!medical)
-            throw new NotFoundException('Hồ sơ không tồn tại')
+            throw new NotFoundException('medical_record_not_found')
 
         return medical
     }
@@ -38,7 +38,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
         return {
             "code": 200,
-            "message": "Success",
+            "message": "success",
             "data": data
         }
     }
@@ -54,7 +54,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         try {
             await this.patientRecordRepository.save(record)
         } catch (error) {
-            throw new BadRequestException('Tạo tài liệu thất bại')
+            throw new BadRequestException('create_patient_record_failed')
         }
 
         return {
@@ -67,17 +67,20 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         const record = await this.patientRecordRepository.findOne({ where: { id: recordId }, relations: ['medical'] })
         
         if(record.medical.managerId !== userId)
-            throw new UnauthorizedException('not have access')
+            throw new ForbiddenException('not_have_access')
 
         try {
             await this.patientRecordRepository.remove(record)
         } catch (error) {
-            throw new BadRequestException('Xóa tài liệu thất bại')
+            throw new BadRequestException('remove_patient_record_failed')
         }
 
         return {
-            "code": 200,
-            "message": "success"
+            medicalId: record.medical.id,
+            data: {
+                "code": 200,
+                "message": "success"
+            }
         }
     }
 }

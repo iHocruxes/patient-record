@@ -21,7 +21,7 @@ export class HealthStatService extends BaseService<HealthStat>{
         const medical = await this.medicalRecordRepository.findOne( { where: { 'id': medicalId, 'managerId': userId }, relations: ['healthStats'] })
 
         if(!medical)
-            throw new NotFoundException('Hồ sơ không tồn tại')
+            throw new NotFoundException('medical_record_not_found')
 
         return medical
     }
@@ -58,7 +58,7 @@ export class HealthStatService extends BaseService<HealthStat>{
 
         return {
             "code": 200,
-            "message": "Success",
+            "message": "success",
             "data": data
         }
     }
@@ -74,7 +74,7 @@ export class HealthStatService extends BaseService<HealthStat>{
         try {
             await this.healthStatRepository.save(stat)
         } catch (error) {
-            throw new BadRequestException('Chỉnh sửa thất bại')
+            throw new BadRequestException('create_health_stat_failed')
         }
     }
 
@@ -84,7 +84,7 @@ export class HealthStatService extends BaseService<HealthStat>{
 
         for(let i = 0; i < dto.stats.length; i++) {
             if(!(dto.stats[i].type in HealthStats))
-                throw new BadRequestException('Sai cú pháp')
+                throw new BadRequestException('wrong_syntax')
 
             if(dto.stats[i].type === HealthStats.Head_cricumference) {
                 this.addStat(dto.stats[i], medical)
@@ -100,7 +100,7 @@ export class HealthStatService extends BaseService<HealthStat>{
                     try {
                         await this.healthStatRepository.save(stats[j])
                     } catch (error) {
-                        throw new BadRequestException('Chỉnh sửa thất bại')
+                        throw new BadRequestException('update_health_stat_failed')
                     }
 
                     flag = true
