@@ -5,7 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { MedicalRecord } from "../entities/medical-record.entity";
 import { Repository } from "typeorm";
 import { HealthStatDto } from "../dtos/health-stat.dto";
-import { HealthStats } from "../../config/enum.constants";
+import { BloodGroup, HealthStats } from "../../config/enum.constants";
 import { StatDetailDto } from "../dtos/stat-detail.dto";
 
 @Injectable()
@@ -39,13 +39,22 @@ export class HealthStatService extends BaseService<HealthStat>{
                     updated_at: stat.updated_at
                 })
             } else {
-                data.push({
-                    id: stat.id,
-                    type: stat.health_stat_type,
-                    value: stat.value,
-                    unit: stat.unit,
-                    updated_at: stat.updated_at
-                })
+                if(stat.health_stat_type === HealthStats.Blood_group)
+                    data.push({
+                        id: stat.id,
+                        type: stat.health_stat_type,
+                        value: BloodGroup[stat.value],
+                        unit: stat.unit,
+                        updated_at: stat.updated_at
+                    })
+                else 
+                    data.push({
+                        id: stat.id,
+                        type: stat.health_stat_type,
+                        value: stat.value,
+                        unit: stat.unit,
+                        updated_at: stat.updated_at
+                    })
             }
         })
 
@@ -85,6 +94,10 @@ export class HealthStatService extends BaseService<HealthStat>{
         for(let i = 0; i < dto.stats.length; i++) {
             if(!(dto.stats[i].type in HealthStats))
                 throw new BadRequestException('wrong_syntax')
+
+            if(dto.stats[i].type === HealthStats.Blood_group && !(dto.stats[i].value in BloodGroup)) {
+                throw new BadRequestException('wrong_syntax')
+            }
 
             if(dto.stats[i].type === HealthStats.Head_cricumference) {
                 this.addStat(dto.stats[i], medical)

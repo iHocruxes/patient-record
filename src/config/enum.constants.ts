@@ -19,3 +19,10 @@ export enum HealthStats {
     Blood_group = "Blood_group",
     Head_cricumference = "Head_cricumference"
 }
+
+export enum BloodGroup {
+    A = 0,
+    B = 1,
+    O = 2,
+    AB = 3
+}
