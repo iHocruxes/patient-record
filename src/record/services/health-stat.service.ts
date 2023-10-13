@@ -91,7 +91,7 @@ export class HealthStatService extends BaseService<HealthStat>{
             }
 
             if(dto.stats[i].type === HealthStats.Head_cricumference) {
-                this.addStat(dto.stats[i], medical)
+                await this.addStat(dto.stats[i], medical)
                 continue
             }
 
@@ -113,7 +113,7 @@ export class HealthStatService extends BaseService<HealthStat>{
             }
 
             if(flag === false) {
-                this.addStat(dto.stats[i], medical)
+                await this.addStat(dto.stats[i], medical)
             }
         }
 
