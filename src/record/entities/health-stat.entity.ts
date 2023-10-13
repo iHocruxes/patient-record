@@ -19,7 +19,7 @@ export class HealthStat {
     @Column({ name: 'health_stat_type', type: 'enum', enum: HealthStats })
     health_stat_type: string
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'float' })
     value: number
 
     @Column({ nullable: true })
