@@ -39,22 +39,13 @@ export class HealthStatService extends BaseService<HealthStat>{
                     updated_at: stat.updated_at
                 })
             } else {
-                if(stat.health_stat_type === HealthStats.Blood_group)
-                    data.push({
-                        id: stat.id,
-                        type: stat.health_stat_type,
-                        value: BloodGroup[stat.value],
-                        unit: stat.unit,
-                        updated_at: stat.updated_at
-                    })
-                else 
-                    data.push({
-                        id: stat.id,
-                        type: stat.health_stat_type,
-                        value: stat.value,
-                        unit: stat.unit,
-                        updated_at: stat.updated_at
-                    })
+                data.push({
+                    id: stat.id,
+                    type: stat.health_stat_type,
+                    value: stat.value,
+                    unit: stat.unit,
+                    updated_at: stat.updated_at
+                })
             }
         })
 
