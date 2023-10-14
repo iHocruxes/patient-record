@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
 
 export abstract class BaseService<T> {
-    constructor(protected readonly repoditory: Repository<T>) {
+    constructor(protected readonly repository: Repository<T>) {
     }
 
     VNTime(n = 0) {
