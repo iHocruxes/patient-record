@@ -11,4 +11,9 @@ export class PatientRecordtDto {
     @IsNotEmpty()
     @ApiProperty({ example: 'document' })
     record: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({ example: 'doc' })
+    type: string
 }

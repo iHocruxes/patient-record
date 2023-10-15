@@ -48,7 +48,8 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
         const record = new PatientRecord()
         record.medical = medical
-        record.record = dto.record
+        record.record = "/healthline/users/" + userId + '/records/' + record.id + '.' + dto.type
+        record.type = dto.type
         record.updated_at = this.VNTime()
 
         try {
@@ -59,7 +60,10 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
         return {
             "code": 201,
-            "message": "created"
+            "message": "created",
+            "data": {
+                record_id: record.id
+            }
         }
     }
 
