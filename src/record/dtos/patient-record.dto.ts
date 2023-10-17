@@ -13,7 +13,11 @@ export class PatientRecordtDto {
     record: string
 
     @IsString()
-    @IsNotEmpty()
     @ApiProperty({ example: 'doc' })
-    type: string
+    format: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({ example: 'raw' })
+    resource_type: string
 }

@@ -48,8 +48,9 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
         const record = new PatientRecord()
         record.medical = medical
-        record.record = "/healthline/users/" + userId + '/records/' + record.id + '.' + dto.type
-        record.type = dto.type
+        record.record = 'healthline/users/' + userId + '/record/' + dto.record
+        record.format = dto.format
+        record.resource_type = dto.resource_type
         record.updated_at = this.VNTime()
 
         try {
