@@ -31,7 +31,9 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         records.forEach(record => {
             data.push({
                 id: record.id,
-                name: record.record,
+                record: record.record,
+                folder: record.folder,
+                size: record.size,
                 update_at: record.updated_at,
             })
         })
