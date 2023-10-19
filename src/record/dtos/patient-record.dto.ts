@@ -11,4 +11,14 @@ export class PatientRecordtDto {
     @IsNotEmpty()
     @ApiProperty({ example: 'document' })
     record: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({ example: 'folder' })
+    folder: string
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({ example: 'size' })
+    size: string
 }

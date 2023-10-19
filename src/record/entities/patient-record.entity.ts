@@ -18,6 +18,12 @@ export class PatientRecord {
     @Column()
     record: string
 
+    @Column()
+    folder: string
+
+    @Column()
+    size: string
+
     @Column({ type: 'timestamp', name: 'update_at', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updated_at: Date;
 }
