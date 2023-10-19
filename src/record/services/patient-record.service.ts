@@ -49,6 +49,8 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         const record = new PatientRecord()
         record.medical = medical
         record.record = dto.record
+        record.folder = dto.folder
+        record.size = dto.size
         record.updated_at = this.VNTime()
 
         try {
