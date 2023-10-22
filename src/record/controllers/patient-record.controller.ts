@@ -15,19 +15,19 @@ export class PatientRecordController {
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
 
-    @UseGuards(JwtGuard)
-    @ApiBearerAuth()
-    @ApiOperation({ summary: 'Thêm hồ sơ bệnh án của bệnh nhân', description: 'Thêm các hồ sơ để bác sĩ có thể theo dõi' })
-    @ApiResponse({ status: 201, description: 'Thành công' })
-    @ApiResponse({ status: 400, description: 'Tạo hồ sơ bệnh nhân thất bại' })
-    @ApiResponse({ status: 401, description: 'Chưa xác thực người dùng' })
-    @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
-    @Post()
-    async createPatientRecord(@Body() dto: PatientRecordtDto, @Req() req): Promise<any> {
-        const data = await this.patientRecordService.createPatientRecord(dto, req.user.id)
-        await this.cacheManager.del('patientRecord-' + dto.medicalId)
-        return data
-    }
+    // @UseGuards(JwtGuard)
+    // @ApiBearerAuth()
+    // @ApiOperation({ summary: 'Thêm hồ sơ bệnh án của bệnh nhân', description: 'Thêm các hồ sơ để bác sĩ có thể theo dõi' })
+    // @ApiResponse({ status: 201, description: 'Thành công' })
+    // @ApiResponse({ status: 400, description: 'Tạo hồ sơ bệnh nhân thất bại' })
+    // @ApiResponse({ status: 401, description: 'Chưa xác thực người dùng' })
+    // @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
+    // @Post()
+    // async createPatientRecord(@Body() dto: PatientRecordtDto, @Req() req): Promise<any> {
+    //     const data = await this.patientRecordService.createPatientRecord(dto, req.user.id)
+    //     await this.cacheManager.del('patientRecord-' + dto.medicalId)
+    //     return data
+    // }
 
     @UseGuards(JwtGuard)
     @ApiBearerAuth()

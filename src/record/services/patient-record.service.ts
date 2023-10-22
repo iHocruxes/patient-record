@@ -19,7 +19,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
     async getMedicalRecord(medicalId: string, userId: string): Promise<MedicalRecord> {
         const medical = await this.medicalRecordRepository.findOne({ where: { 'id': medicalId, 'managerId': userId }, relations: ['patientRecords'] })
 
-        if(!medical)
+        if (!medical)
             throw new NotFoundException('medical_record_not_found')
 
         return medical
@@ -69,8 +69,8 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
     async deletePatientRecord(recordId: string, userId: string) {
         const record = await this.patientRecordRepository.findOne({ where: { id: recordId }, relations: ['medical'] })
-        
-        if(record.medical.managerId !== userId)
+
+        if (record.medical.managerId !== userId)
             throw new ForbiddenException('not_have_access')
 
         try {
@@ -85,6 +85,18 @@ export class PatientRecordService extends BaseService<PatientRecord>{
                 "code": 200,
                 "message": "success"
             }
+        }
+    }
+
+    async convertByte(size: number) {
+        if (size >= 1024 * 1024) { // Nếu kích thước lớn hơn hoặc bằng 1 MB
+            const sizeInMB = (size / (1024 * 1024)).toFixed(2); // Chuyển đổi thành MB với 2 chữ số thập phân
+            return sizeInMB + ' MB';
+        } else if (size >= 1024) { // Nếu kích thước lớn hơn hoặc bằng 1 KB
+            const sizeInKB = (size / 1024).toFixed(2); // Chuyển đổi thành KB với 2 chữ số thập phân
+            return sizeInKB + ' KB';
+        } else {
+            return size + ' B';
         }
     }
 }

@@ -7,13 +7,32 @@ import { HealthStatController } from "./controllers/health-stat.controller";
 import { HealthStatService } from "./services/health-stat.service";
 import { PatientRecordController } from "./controllers/patient-record.controller";
 import { PatientRecordService } from "./services/patient-record.service";
+import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
+import { PatientRecordConsumer } from "./consumers/patient-record.consumer";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([MedicalRecord, HealthStat, PatientRecord])
+        TypeOrmModule.forFeature([MedicalRecord, HealthStat, PatientRecord]),
+        RabbitMQModule.forRoot(RabbitMQModule, {
+            exchanges: [
+                {
+                    name: 'healthline.upload.folder',
+                    type: 'direct'
+                }
+            ],
+            uri: process.env.RABBITMQ_URL,
+            connectionInitOptions: { wait: true, reject: true, timeout: 2000 },
+        }),
     ],
-    controllers: [HealthStatController, PatientRecordController],
-    providers: [HealthStatService, PatientRecordService],
+    controllers: [
+        HealthStatController,
+        PatientRecordController
+    ],
+    providers: [
+        HealthStatService,
+        PatientRecordService,
+        PatientRecordConsumer
+    ],
 })
 export class RecordModule {
 
