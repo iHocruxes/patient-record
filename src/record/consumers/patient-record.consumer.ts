@@ -12,22 +12,7 @@ export class PatientRecordConsumer {
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
 
-    @RabbitRPC({
-        exchange: 'healthline.upload.folder',
-        routingKey: 'upload',
-        queue: 'upload',
-    })
-    async createPatientRecord(cloudinary: CloudinaryConsumer): Promise<any> {
 
-        const dto = new PatientRecordtDto
-        dto.record = cloudinary.data.public_id
-        dto.folder = cloudinary.folder
-        dto.size = await this.patientRecordService.convertByte(cloudinary.data.bytes)
-
-        const data = await this.patientRecordService.createPatientRecord(dto, cloudinary.user)
-        await this.cacheManager.del('patientRecord-' + dto.medicalId)
-        return data
-    }
 
     // @UseGuards(JwtGuard)
     // @ApiBearerAuth()

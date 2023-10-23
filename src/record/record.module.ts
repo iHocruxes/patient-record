@@ -21,7 +21,8 @@ import { PatientRecordConsumer } from "./consumers/patient-record.consumer";
                 }
             ],
             uri: process.env.RABBITMQ_URL,
-            connectionInitOptions: { wait: true, reject: true, timeout: 10000 },
+            connectionInitOptions: { wait: false, reject: true, timeout: 10000 },
+            enableControllerDiscovery: true
         }),
     ],
     controllers: [
@@ -31,7 +32,8 @@ import { PatientRecordConsumer } from "./consumers/patient-record.consumer";
     providers: [
         HealthStatService,
         PatientRecordService,
-        PatientRecordConsumer
+        // PatientRecordConsumer
+        // PatientRecordController
     ],
 })
 export class RecordModule {
