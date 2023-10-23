@@ -32,8 +32,7 @@ import { PatientRecordConsumer } from "./consumers/patient-record.consumer";
     providers: [
         HealthStatService,
         PatientRecordService,
-        // PatientRecordConsumer
-        // PatientRecordController
+        PatientRecordConsumer
     ],
 })
 export class RecordModule {
