@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as dotenv from 'dotenv'
 import { ValidationPipe } from '@nestjs/common';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 dotenv.config()
 
@@ -11,17 +10,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix(process.env.SERVER_NAME)
-
-  const rabbitmq = app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      queue: 'cats_queue',
-      urls: [process.env.RABBITMQ_URL],
-      queueOptions: {
-        durable: false
-      },
-    }
-  })
 
   await app.startAllMicroservices()
 

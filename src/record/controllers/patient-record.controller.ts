@@ -6,7 +6,6 @@ import { CloudinaryConsumer, PatientRecordtDto } from "../dtos/patient-record.dt
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager";
 // import { RabbitRPC } from "@golevelup/nestjs-rabbitmq"
-import { EventPattern, Payload, Ctx, RmqContext } from "@nestjs/microservices"
 
 @ApiTags('Patient Record')
 
@@ -16,12 +15,6 @@ export class PatientRecordController {
         private readonly patientRecordService: PatientRecordService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
-
-    @EventPattern('haha')
-    async data(@Payload() data, @Ctx() context: RmqContext) {
-        data = { data: 1 }
-        return data
-    }
 
     // @UseGuards(JwtGuard)
     // @ApiBearerAuth()
