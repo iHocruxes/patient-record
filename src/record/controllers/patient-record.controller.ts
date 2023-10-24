@@ -20,7 +20,7 @@ export class PatientRecordController {
 
     @Get("wait")
     async waiting(): Promise<any> {
-        this.amqpConnection.connection(10000)
+        this.amqpConnection.connected
         await new Promise(r => setTimeout(r, 5000));
         return
     }
