@@ -16,6 +16,12 @@ export class PatientRecordController {
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
 
+    @Get("wait")
+    async waiting(): Promise<any> {
+        await new Promise(r => setTimeout(r, 5000));
+        return
+    }
+
     // @UseGuards(JwtGuard)
     // @ApiBearerAuth()
     // @ApiOperation({ summary: 'Thêm hồ sơ bệnh án của bệnh nhân', description: 'Thêm các hồ sơ để bác sĩ có thể theo dõi' })
