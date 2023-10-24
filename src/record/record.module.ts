@@ -21,7 +21,7 @@ import { PatientRecordConsumer } from "./consumers/patient-record.consumer";
                 }
             ],
             uri: process.env.RABBITMQ_URL,
-            connectionInitOptions: { wait: false, reject: true, timeout: 10000 },
+            connectionInitOptions: { wait: false, reject: true, timeout: 100000 },
             enableControllerDiscovery: true
         }),
     ],
