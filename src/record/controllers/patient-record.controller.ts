@@ -18,7 +18,7 @@ export class PatientRecordController {
     ) { }
 
     @Get("wait")
-    waiting(): Promise<any> {
+    waiting() {
         const date = Date.now();
         let currentDate = null;
         do {
