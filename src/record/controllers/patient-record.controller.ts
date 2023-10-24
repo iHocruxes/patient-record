@@ -5,6 +5,7 @@ import { PatientRecordService } from "../services/patient-record.service"
 import { CloudinaryConsumer, PatientRecordtDto } from "../dtos/patient-record.dto"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager";
+import { AmqpConnection } from "@golevelup/nestjs-rabbitmq"
 // import { RabbitRPC } from "@golevelup/nestjs-rabbitmq"
 
 @ApiTags('Patient Record')
@@ -13,11 +14,13 @@ import { Cache } from "cache-manager";
 export class PatientRecordController {
     constructor(
         private readonly patientRecordService: PatientRecordService,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        private readonly amqpConnection: AmqpConnection,
     ) { }
 
     @Get("wait")
     async waiting(): Promise<any> {
+        this.amqpConnection.connection(10000)
         await new Promise(r => setTimeout(r, 5000));
         return
     }
