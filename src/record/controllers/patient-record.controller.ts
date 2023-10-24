@@ -15,13 +15,15 @@ export class PatientRecordController {
     constructor(
         private readonly patientRecordService: PatientRecordService,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        private readonly amqpConnection: AmqpConnection,
     ) { }
 
     @Get("wait")
-    async waiting(): Promise<any> {
-        this.amqpConnection.connected
-        await new Promise(r => setTimeout(r, 5000));
+    waiting(): Promise<any> {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+          currentDate = Date.now();
+        } while (currentDate - date < 5000);
         return
     }
 
