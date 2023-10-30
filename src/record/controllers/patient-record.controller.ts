@@ -5,6 +5,7 @@ import { PatientRecordService } from "../services/patient-record.service"
 import { CloudinaryConsumer, PatientRecordtDto } from "../dtos/patient-record.dto"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager";
+import { AmqpConnection } from "@golevelup/nestjs-rabbitmq"
 // import { RabbitRPC } from "@golevelup/nestjs-rabbitmq"
 
 @ApiTags('Patient Record')
@@ -13,6 +14,7 @@ import { Cache } from "cache-manager";
 export class PatientRecordController {
     constructor(
         private readonly patientRecordService: PatientRecordService,
+        private readonly amqpConnection: AmqpConnection,
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
 
@@ -61,5 +63,24 @@ export class PatientRecordController {
         const result = await this.patientRecordService.deletePatientRecord(recordId, req.user.id)
         await this.cacheManager.del('patientRecord-' + result.medicalId)
         return result.data
+    }
+
+    @Post('amqp')
+    async getHello() {
+        const timeout = 10000;
+        const startTime = Date.now();
+
+        if (this.amqpConnection.connected)
+            return 'amqp connected'
+
+        while (!this.amqpConnection.connected) {
+            const currentTime = Date.now();
+            if (currentTime - startTime >= timeout) {
+                break;
+            }
+            console.log('connecting...')
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        return 'fail to connect amqp'
     }
 }
