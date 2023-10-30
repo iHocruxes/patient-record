@@ -18,6 +18,16 @@ export class PatientRecordController {
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
 
+    @Get("wait")
+    waiting() {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+            currentDate = Date.now();
+        } while (currentDate - date < 5000);
+        return
+    }
+
     // @UseGuards(JwtGuard)
     // @ApiBearerAuth()
     // @ApiOperation({ summary: 'Thêm hồ sơ bệnh án của bệnh nhân', description: 'Thêm các hồ sơ để bác sĩ có thể theo dõi' })
