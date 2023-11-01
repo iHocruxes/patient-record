@@ -80,10 +80,10 @@ export class PatientRecordController {
         const timeout = 10000;
         const startTime = Date.now();
 
-        if (this.amqpConnection.connected)
-            return 'amqp connected'
+        if (!this.amqpConnection.connected)
+            return 'fail to connected'
 
-        while (!this.amqpConnection.connected) {
+        while (this.amqpConnection.connected) {
             const currentTime = Date.now();
             if (currentTime - startTime >= timeout) {
                 break;
@@ -91,6 +91,5 @@ export class PatientRecordController {
             console.log('connecting...')
             await new Promise((resolve) => setTimeout(resolve, 1000));
         }
-        return 'fail to connect amqp'
     }
 }
