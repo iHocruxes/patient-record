@@ -77,7 +77,7 @@ export class PatientRecordController {
 
     @Post('amqp')
     async getHello() {
-        const timeout = 10000;
+        const timeout = 5000;
         const startTime = Date.now();
 
         if (!this.amqpConnection.connected)
@@ -89,7 +89,7 @@ export class PatientRecordController {
                 break;
             }
             console.log('connecting...')
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 500));
         }
 
         return true
