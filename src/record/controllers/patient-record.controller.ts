@@ -81,7 +81,7 @@ export class PatientRecordController {
         const startTime = Date.now();
 
         if (!this.amqpConnection.connected)
-            return 'fail to connected'
+            return false
 
         while (this.amqpConnection.connected) {
             const currentTime = Date.now();
@@ -91,5 +91,7 @@ export class PatientRecordController {
             console.log('connecting...')
             await new Promise((resolve) => setTimeout(resolve, 1000));
         }
+
+        return true
     }
 }
