@@ -82,7 +82,6 @@ export class PatientRecordController {
 
         if (!this.amqpConnection.connected)
             return false
-
         while (this.amqpConnection.connected) {
             const currentTime = Date.now();
             if (currentTime - startTime >= timeout) {
