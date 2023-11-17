@@ -12,12 +12,12 @@ import { RedisClientOptions } from 'redis';
       ...postgresOption,
       autoLoadEntities: true
     }),
-    CacheModule.register<RedisClientOptions>({
-      isGlobal: true,
-      ...redisClientOption
-    }),
+    // CacheModule.register<RedisClientOptions>({
+    //   isGlobal: true,
+    //   ...redisClientOption
+    // }),
     AuthModule,
-    RecordModule
+    // RecordModule
   ],
 })
 export class AppModule { }
