@@ -8,10 +8,10 @@ import { RedisClientOptions } from 'redis';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      ...postgresOption,
-      autoLoadEntities: true
-    }),
+    // TypeOrmModule.forRoot({
+    //   ...postgresOption,
+    //   autoLoadEntities: true
+    // }),
     // CacheModule.register<RedisClientOptions>({
     //   isGlobal: true,
     //   ...redisClientOption
