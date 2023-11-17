@@ -57,6 +57,11 @@ USER node
 # Copy package.json so that package manager commands can be used.
 COPY package.json .
 
+# Copy the production dependencies from the deps stage and also
+# the built application from the build stage into the image.
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app// .//
+
 
 # Expose the port that the application listens on.
 EXPOSE 3005
