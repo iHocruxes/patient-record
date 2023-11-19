@@ -17,7 +17,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
     }
 
     async getMedicalRecord(medicalId: string, userId: string): Promise<MedicalRecord> {
-        const medical = await this.medicalRecordRepository.findOne({ where: { 'isMainProfile': true, 'managerId': userId }, relations: ['patientRecords'] })
+        const medical = await this.medicalRecordRepository.findOne({ where: { 'id': medicalId, 'managerId': userId }, relations: ['patientRecords'] })
 
         if (!medical)
             throw new NotFoundException('medical_record_not_found')
