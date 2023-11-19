@@ -47,4 +47,5 @@ export class CloudinaryConsumer {
     }
     user: string
     folder: string
+    medicalId: string
 }

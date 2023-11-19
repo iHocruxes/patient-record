@@ -74,23 +74,4 @@ export class PatientRecordController {
         await this.cacheManager.del('patientRecord-' + result.medicalId)
         return result.data
     }
-
-    @Post('amqp')
-    async getHello() {
-        const timeout = 5000;
-        const startTime = Date.now();
-
-        if (!this.amqpConnection.connected)
-            return false
-        while (this.amqpConnection.connected) {
-            const currentTime = Date.now();
-            if (currentTime - startTime >= timeout) {
-                break;
-            }
-            console.log('connecting...')
-            await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-
-        return true
-    }
 }

@@ -14,13 +14,12 @@ export class PatientRecordConsumer {
 
     @RabbitRPC({
         exchange: 'healthline.upload.folder',
-        routingKey: 'upload',
+        routingKey: 'upload', 
         queue: 'upload',
     })
     async createPatientRecord(cloudinary: CloudinaryConsumer): Promise<any> {
-
         const dto = new PatientRecordtDto
-        // dto.medicalId = "5zUMJglcjB66pAZ5nJ6Yz"
+        dto.medicalId = cloudinary.medicalId
         dto.record = cloudinary.data.public_id
         dto.folder = cloudinary.folder
         dto.size = await this.patientRecordService.convertByte(cloudinary.data.bytes)
