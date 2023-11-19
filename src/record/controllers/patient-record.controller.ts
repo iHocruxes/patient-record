@@ -68,9 +68,9 @@ export class PatientRecordController {
     @ApiResponse({ status: 403, description: 'Không có quyền truy cập' })
     @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
     @ApiResponse({ status: 500, description: 'Lỗi máy chủ' })
-    @Delete(':recordId')
-    async deletePatientRecord(@Param('recordId') recordId: string, @Req() req): Promise<any> {
-        const result = await this.patientRecordService.deletePatientRecord(recordId, req.user.id)
+    @Delete()
+    async deletePatientRecord(@Body() dto: {recordIds: string[]}, @Req() req): Promise<any> {
+        const result = await this.patientRecordService.deletePatientRecord(dto.recordIds, req.user.id)
         await this.cacheManager.del('patientRecord-' + result.medicalId)
         return result.data
     }

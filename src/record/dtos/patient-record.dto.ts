@@ -42,7 +42,7 @@ export class CloudinaryConsumer {
         folder: string,
         access_mode: string,
         overwritten: boolean,
-        original_filname: string,
+        original_filename: string,
         api_key: string
     }
     user: string

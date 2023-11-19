@@ -3,15 +3,17 @@ import { PatientRecord } from "../entities/patient-record.entity";
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MedicalRecord } from "../entities/medical-record.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { PatientRecordtDto } from "../dtos/patient-record.dto";
 import { ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 
 @Injectable()
 export class PatientRecordService extends BaseService<PatientRecord>{
     constructor(
         @InjectRepository(PatientRecord) private readonly patientRecordRepository: Repository<PatientRecord>,
-        @InjectRepository(MedicalRecord) private readonly medicalRecordRepository: Repository<MedicalRecord>
+        @InjectRepository(MedicalRecord) private readonly medicalRecordRepository: Repository<MedicalRecord>,
+        private readonly amqpConnection: AmqpConnection,
     ) {
         super(patientRecordRepository)
     }
@@ -19,14 +21,14 @@ export class PatientRecordService extends BaseService<PatientRecord>{
     async getMedicalRecord(medicalId: string, userId: string): Promise<MedicalRecord> {
         const medical = await this.medicalRecordRepository.findOne({ where: { 'id': medicalId, 'managerId': userId }, relations: ['patientRecords'] })
 
-        if (!medical)
-            throw new NotFoundException('medical_record_not_found')
-
         return medical
     }
 
     async getAllPatientRecordOfMedicalRecord(medicalId: string, userId: string): Promise<any> {
-        const records = (await this.getMedicalRecord(medicalId, userId)).patientRecords
+        const medical = await this.getMedicalRecord(medicalId, userId)
+        if (!medical)
+            throw new NotFoundException('medical_record_not_found')
+        const records = medical.patientRecords
         const data = []
         records.forEach(record => {
             data.push({
@@ -47,7 +49,11 @@ export class PatientRecordService extends BaseService<PatientRecord>{
 
     async createPatientRecord(dto: PatientRecordtDto, userId: string) {
         const medical = await this.getMedicalRecord(dto.medicalId, userId)
-
+        if (!medical)
+            return {
+                "code": 404,
+                "message": "medical_record_not_found",
+            }
         const record = new PatientRecord()
         record.medical = medical
         record.record = dto.record
@@ -58,7 +64,10 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         try {
             await this.patientRecordRepository.save(record)
         } catch (error) {
-            throw new BadRequestException('create_patient_record_failed')
+            return {
+                "code": 400,
+                "message": "create_patient_record_failed",
+            }
         }
 
         return {
@@ -67,11 +76,19 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         }
     }
 
-    async deletePatientRecord(recordId: string, userId: string) {
-        const record = await this.patientRecordRepository.findOne({ where: { id: recordId }, relations: ['medical'] })
+    async deletePatientRecord(recordIds: string[], userId: string) {
+        const record = await this.patientRecordRepository.find({ where: { id: In(recordIds) }, relations: ['medical'] })
 
-        if (record.medical.managerId !== userId)
-            throw new ForbiddenException('not_have_access')
+        for(let i=0; i<record.length; i++)
+            if (record[i].medical.managerId !== userId)
+                throw new ForbiddenException('not_have_access')
+
+        const rabbit = await this.amqpConnection.request<any>({
+            exchange: 'healthline.upload.folder',
+            routingKey: 'delete_file',
+            payload: record.map(r => r.record),
+            timeout: 20000,
+        })
 
         try {
             await this.patientRecordRepository.remove(record)
@@ -80,11 +97,8 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         }
 
         return {
-            medicalId: record.medical.id,
-            data: {
-                "code": 200,
-                "message": "success"
-            }
+            medicalId: record[0].medical.id,
+            data: rabbit
         }
     }
 
