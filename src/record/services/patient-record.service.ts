@@ -76,6 +76,38 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         }
     }
 
+    async getMedicalRecordInfomation(medicalId: string): Promise<any> {
+        const medical = await this.medicalRecordRepository.findOne({ where: { 'id': medicalId }, relations: ['patientRecords'] })
+        if (!medical)
+            throw new NotFoundException('medical_record_not_found')
+        const records = medical.patientRecords
+        const data = []
+        records.forEach(record => {
+            data.push({
+                id: record.id,
+                record: record.record,
+                folder: record.folder,
+                size: record.size,
+                update_at: record.updated_at,
+            })
+        })
+
+        return {
+            "code": 200,
+            "message": "success",
+            "data": {
+                id: medical.id,
+                full_name: medical.full_name,
+                date_of_birth: medical.date_of_birth,
+                gender: medical.gender,
+                relationship: medical.relationship,
+                avatar: medical.avatar,
+                address: medical.address,
+                records: data
+            }
+        }
+    }
+
     async deletePatientRecord(recordIds: string[], userId: string) {
         const record = await this.patientRecordRepository.find({ where: { id: In(recordIds) }, relations: ['medical'] })
 
