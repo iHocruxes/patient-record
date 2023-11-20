@@ -81,6 +81,9 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         if (!medical)
             throw new NotFoundException('medical_record_not_found')
         const records = medical.patientRecords
+        var relation = ""
+        if(medical.relationship !== null)
+            relation = medical.relationship
         const data = []
         records.forEach(record => {
             data.push({
@@ -100,7 +103,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
                 full_name: medical.full_name,
                 date_of_birth: medical.date_of_birth,
                 gender: medical.gender,
-                relationship: medical.relationship,
+                relationship: relation,
                 avatar: medical.avatar,
                 address: medical.address,
                 records: data
