@@ -82,27 +82,27 @@ export class HealthStatService extends BaseService<HealthStat>{
         const medical = await this.getMedicalRecord(dto.medicalId, userId)
         const stats = medical.healthStats
 
-        for(let i = 0; i < dto.stats.length; i++) {
-            if(!(dto.stats[i].type in HealthStats))
+        for(let stat of dto.stats) {
+            if(!(stat.type in HealthStats))
                 throw new BadRequestException('wrong_syntax')
 
-            if(dto.stats[i].type === HealthStats.Blood_group && !(dto.stats[i].value in BloodGroup)) {
+            if(stat.type === HealthStats.Blood_group && !(stat.value in BloodGroup)) {
                 throw new BadRequestException('wrong_syntax')
             }
 
-            if(dto.stats[i].type === HealthStats.Head_cricumference) {
-                await this.addStat(dto.stats[i], medical)
+            if(stat.type === HealthStats.Head_cricumference) {
+                await this.addStat(stat, medical)
                 continue
             }
 
             var flag = false
-            for(let j = 0; j < stats.length; j++) {
-                if(dto.stats[i].type === stats[j].health_stat_type ) {
-                    stats[j].value = dto.stats[i].value
-                    stats[j].unit = dto.stats[i].unit
+            for(let checkStat of stats) {
+                if(stat.type === checkStat.health_stat_type ) {
+                    checkStat.value = stat.value
+                    checkStat.unit = stat.unit
                     
                     try {
-                        await this.healthStatRepository.save(stats[j])
+                        await this.healthStatRepository.save(checkStat)
                     } catch (error) {
                         throw new BadRequestException('update_health_stat_failed')
                     }
@@ -113,7 +113,7 @@ export class HealthStatService extends BaseService<HealthStat>{
             }
 
             if(flag === false) {
-                await this.addStat(dto.stats[i], medical)
+                await this.addStat(stat, medical)
             }
         }
 
