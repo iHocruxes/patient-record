@@ -26,6 +26,6 @@ export class PatientRecordConsumer {
 
         const data = await this.patientRecordService.createPatientRecord(dto, cloudinary.user)
         await this.cacheManager.del('patientRecord-' + dto.medicalId)
-        return data
+        return data 
     }
 }
