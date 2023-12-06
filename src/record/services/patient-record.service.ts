@@ -114,6 +114,9 @@ export class PatientRecordService extends BaseService<PatientRecord>{
     async deletePatientRecord(recordIds: string[], userId: string) {
         const record = await this.patientRecordRepository.find({ where: { id: In(recordIds) }, relations: ['medical'] })
 
+        if(record.length === 0)
+            throw new BadRequestException("not_found_patient-record")
+
         for(let i=0; i<record.length; i++)
             if (record[i].medical.managerId !== userId)
                 throw new ForbiddenException('not_have_access')
@@ -124,6 +127,9 @@ export class PatientRecordService extends BaseService<PatientRecord>{
             payload: record.map(r => r.record),
             timeout: 20000,
         })
+
+        if(rabbit.code !== 200)
+            return rabbit
 
         try {
             await this.patientRecordRepository.remove(record)

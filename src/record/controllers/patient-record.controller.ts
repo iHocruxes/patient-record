@@ -6,8 +6,7 @@ import { CloudinaryConsumer, PatientRecordtDto } from "../dtos/patient-record.dt
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager";
 import { AmqpConnection } from "@golevelup/nestjs-rabbitmq"
-import { StringDecoder } from "string_decoder"
-// import { RabbitRPC } from "@golevelup/nestjs-rabbitmq"
+import { AdminGuard } from "../../auth/guards/admin.guard"
 
 @ApiTags('Patient Record')
 
@@ -18,21 +17,6 @@ export class PatientRecordController {
         private readonly amqpConnection: AmqpConnection,
         @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) { }
-
-    // @UseGuards(JwtGuard)
-    // @ApiBearerAuth()
-    // @ApiOperation({ summary: 'Thêm hồ sơ bệnh án của bệnh nhân', description: 'Thêm các hồ sơ để bác sĩ có thể theo dõi' })
-    // @ApiResponse({ status: 201, description: 'Thành công' })
-    // @ApiResponse({ status: 400, description: 'Tạo hồ sơ bệnh nhân thất bại' })
-    // @ApiResponse({ status: 401, description: 'Chưa xác thực người dùng' })
-    // @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
-    // @Post()
-    // async createPatientRecord(@Body() dto: PatientRecordtDto, @Req() req): Promise<any> {
-    //     const data = await this.patientRecordService.createPatientRecord(dto, req.user.id)
-    //     await this.cacheManager.del('patientRecord-' + dto.medicalId)
-    //     return data
-    // }
-
     @UseGuards(JwtGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Xem các hồ sơ bệnh án bệnh nhân', description: 'Xem các hồ sơ bệnh án bệnh nhân' })
@@ -46,25 +30,7 @@ export class PatientRecordController {
 
         const data = await this.patientRecordService.getAllPatientRecordOfMedicalRecord(medicalId, req.user.id)
 
-        await this.cacheManager.set('patientRecord-' + medicalId, data)
-
-        return data
-    }
-
-    // @UseGuards(JwtGuard)
-    // @ApiBearerAuth()
-    @ApiOperation({ summary: 'Xem các hồ sơ bệnh án bệnh nhân', description: 'Xem các hồ sơ bệnh án bệnh nhân' })
-    @ApiResponse({ status: 200, description: 'Thành công' })
-    @ApiResponse({ status: 401, description: 'Chưa xác thực người dùng' })
-    @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
-    @Get('/medical/:medicalId')
-    async getMedicalRecordInfomation(@Param('medicalId') medicalId: string): Promise<any> {
-        // const cacheSchedules = await this.cacheManager.get('medical-patient-' + medicalId);
-        // if (cacheSchedules) return cacheSchedules
-
-        const data = await this.patientRecordService.getMedicalRecordInfomation(medicalId)
-
-        // await this.cacheManager.set('medical-patient-' + medicalId, data)
+        await this.cacheManager.set('patient-record-' + medicalId, data)
 
         return data
     }
@@ -80,7 +46,42 @@ export class PatientRecordController {
     @Delete()
     async deletePatientRecord(@Body() dto: {recordIds: string[]}, @Req() req): Promise<any> {
         const result = await this.patientRecordService.deletePatientRecord(dto.recordIds, req.user.id)
-        await this.cacheManager.del('patientRecord-' + result.medicalId)
+        await this.cacheManager.del('patient-record-' + result.medicalId)
+        await this.cacheManager.del('medical-patient-' + result.medicalId)
+        return result.data
+    }
+
+    @UseGuards(AdminGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Xem các hồ sơ bệnh án bệnh nhân', description: 'Xem các hồ sơ bệnh án bệnh nhân' })
+    @ApiResponse({ status: 200, description: 'Thành công' })
+    @ApiResponse({ status: 401, description: 'Chưa xác thực người dùng' })
+    @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
+    @Get('/admin/:medicalId')
+    async getMedicalRecordInfomation(@Param('medicalId') medicalId: string): Promise<any> {
+        const cacheSchedules = await this.cacheManager.get('medical-record-' + medicalId);
+        if (cacheSchedules) return cacheSchedules
+
+        const data = await this.patientRecordService.getMedicalRecordInfomation(medicalId)
+
+        await this.cacheManager.set('medical-patient-' + medicalId, data)
+
+        return data
+    }
+
+    @UseGuards(AdminGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Xóa hồ sơ bệnh án của bệnh nhân', description: 'Xóa hồ sơ bệnh án của bệnh nhận' })
+    @ApiResponse({ status: 200, description: 'Thành công' })
+    @ApiResponse({ status: 401, description: 'Chưa xác thực người dùng' })
+    @ApiResponse({ status: 403, description: 'Không có quyền truy cập' })
+    @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
+    @ApiResponse({ status: 500, description: 'Lỗi máy chủ' })
+    @Delete(':userId')
+    async deletePatientRecordAdmin(@Body() dto: {recordIds: string[]}, @Param('userId') userId: string): Promise<any> {
+        const result = await this.patientRecordService.deletePatientRecord(dto.recordIds, userId)
+        await this.cacheManager.del('patient-record-' + result.medicalId)
+        await this.cacheManager.del('medical-patient-' + result.medicalId)
         return result.data
     }
 }
