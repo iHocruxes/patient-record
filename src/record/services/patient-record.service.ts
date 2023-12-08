@@ -121,11 +121,13 @@ export class PatientRecordService extends BaseService<PatientRecord>{
             if (record[i].medical.managerId !== userId)
                 throw new ForbiddenException('not_have_access')
 
+        const data = record.map(r => r.record)
+
         const rabbit = await this.amqpConnection.request<any>({
             exchange: 'healthline.upload.folder',
             routingKey: 'delete_file',
-            payload: record.map(r => r.record),
-            timeout: 20000,
+            payload: data,
+            timeout: 10000 * data.length + 10000,
         })
 
         if(rabbit.code !== 200)
