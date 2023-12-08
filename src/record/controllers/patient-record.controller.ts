@@ -28,7 +28,7 @@ export class PatientRecordController {
         const cacheSchedules = await this.cacheManager.get('patient-record-' + medicalId);
         if (cacheSchedules) return cacheSchedules
 
-        const data = await this.patientRecordService.getAllPatientRecordOfMedicalRecord(medicalId, req.user.id)
+        const data = await this.patientRecordService.getAllPatientRecordOfMedicalRecord(medicalId, req.user.id, false)
 
         await this.cacheManager.set('patient-record-' + medicalId, data)
 
@@ -47,7 +47,6 @@ export class PatientRecordController {
     async deletePatientRecord(@Body() dto: {recordIds: string[]}, @Req() req): Promise<any> {
         const result = await this.patientRecordService.deletePatientRecord(dto.recordIds, req.user.id)
         await this.cacheManager.del('patient-record-' + result.medicalId)
-        await this.cacheManager.del('medical-patient-' + result.medicalId)
         return result.data
     }
 
@@ -59,12 +58,12 @@ export class PatientRecordController {
     @ApiResponse({ status: 404, description: 'Không tìm thấy hồ sơ bệnh án' })
     @Get('/admin/:medicalId')
     async getMedicalRecordInfomation(@Param('medicalId') medicalId: string): Promise<any> {
-        const cacheSchedules = await this.cacheManager.get('medical-record-' + medicalId);
+        const cacheSchedules = await this.cacheManager.get('patient-record-' + medicalId);
         if (cacheSchedules) return cacheSchedules
 
-        const data = await this.patientRecordService.getMedicalRecordInfomation(medicalId)
+        const data = await this.patientRecordService.getAllPatientRecordOfMedicalRecord(medicalId, "", true)
 
-        await this.cacheManager.set('medical-patient-' + medicalId, data)
+        await this.cacheManager.set('patient-record-' + medicalId, data)
 
         return data
     }
@@ -81,7 +80,6 @@ export class PatientRecordController {
     async deletePatientRecordAdmin(@Body() dto: {recordIds: string[]}, @Param('userId') userId: string): Promise<any> {
         const result = await this.patientRecordService.deletePatientRecord(dto.recordIds, userId)
         await this.cacheManager.del('patient-record-' + result.medicalId)
-        await this.cacheManager.del('medical-patient-' + result.medicalId)
         return result.data
     }
 }

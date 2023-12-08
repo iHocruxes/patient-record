@@ -25,7 +25,7 @@ export class PatientRecordConsumer {
         dto.size = await this.patientRecordService.convertByte(cloudinary.data.bytes)
 
         const data = await this.patientRecordService.createPatientRecord(dto, cloudinary.user)
-        await this.cacheManager.del('patientRecord-' + dto.medicalId)
+        await this.cacheManager.del('patient-record-' + dto.medicalId)
         return data 
     }
 }

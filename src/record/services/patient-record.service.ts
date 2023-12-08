@@ -7,15 +7,12 @@ import { In, Repository } from "typeorm";
 import { PatientRecordtDto } from "../dtos/patient-record.dto";
 import { ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
-import { CACHE_MANAGER } from "@nestjs/cache-manager"
-import { Cache } from "cache-manager";
 @Injectable()
 export class PatientRecordService extends BaseService<PatientRecord>{
     constructor(
         @InjectRepository(PatientRecord) private readonly patientRecordRepository: Repository<PatientRecord>,
         @InjectRepository(MedicalRecord) private readonly medicalRecordRepository: Repository<MedicalRecord>,
         private readonly amqpConnection: AmqpConnection,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) {
         super(patientRecordRepository)
     }
@@ -26,10 +23,13 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         return medical
     }
 
-    async getAllPatientRecordOfMedicalRecord(medicalId: string, userId: string): Promise<any> {
-        const medical = await this.getMedicalRecord(medicalId, userId)
+    async getAllPatientRecordOfMedicalRecord(medicalId: string, userId: string, isAdmin: boolean): Promise<any> {
+        var medical
+        if(isAdmin) medical = await this.medicalRecordRepository.findOne({ where: { 'id': medicalId }, relations: ['patientRecords'] })
+        else medical = await this.getMedicalRecord(medicalId, userId)
         if (!medical)
             throw new NotFoundException('medical_record_not_found')
+        
         const records = medical.patientRecords
         const data = []
         records.forEach(record => {
@@ -71,10 +71,6 @@ export class PatientRecordService extends BaseService<PatientRecord>{
                 "message": "create_patient_record_failed",
             }
         }
-
-        await this.cacheManager.del('patient-record-' + dto.medicalId)
-        await this.cacheManager.del('medical-patient-' + dto.medicalId)
-
         return {
             "code": 201,
             "message": "created"
