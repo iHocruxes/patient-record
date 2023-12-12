@@ -18,6 +18,10 @@ import { PatientRecordConsumer } from "./consumers/patient-record.consumer";
                 {
                     name: 'healthline.upload.folder',
                     type: 'direct'
+                },
+                {
+                    name: 'healthline.user.information',
+                    type: 'direct'
                 }
             ],
             uri: process.env.RABBITMQ_URL,

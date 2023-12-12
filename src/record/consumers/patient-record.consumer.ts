@@ -3,7 +3,7 @@ import { PatientRecordService } from "../services/patient-record.service"
 import { CloudinaryConsumer, PatientRecordtDto } from "../dtos/patient-record.dto"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager";
-import { RabbitRPC } from "@golevelup/nestjs-rabbitmq"
+import { RabbitPayload, RabbitRPC } from "@golevelup/nestjs-rabbitmq"
 
 @Injectable()
 export class PatientRecordConsumer {
@@ -27,5 +27,14 @@ export class PatientRecordConsumer {
         const data = await this.patientRecordService.createPatientRecord(dto, cloudinary.user)
         await this.cacheManager.del('patient-record-' + dto.medicalId)
         return data 
+    }
+
+    @RabbitRPC({
+        exchange: 'healthline.user.information',
+        routingKey: 'user',
+        queue: 'user',
+    })
+    async findAllMainRecord(@RabbitPayload() uids: string[]): Promise<any> {
+        return this.patientRecordService.findAllMainRecord(uids)
     }
 }
