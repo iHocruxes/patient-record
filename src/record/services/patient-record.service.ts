@@ -158,6 +158,30 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         }
     }
 
+    async findAllMedicalRecord(ids: string[]) {
+        const records = await this.medicalRecordRepository.find({ where: { id: In(ids) } })
+
+        if(records.length === 0)
+            return {
+                code: 404,
+                message: "medical_record_not_found"
+            }
+
+        const data = []
+        records.forEach(e => {
+            data.push({
+                uid: e.managerId,
+                full_name: e.full_name,
+                avatar: e.avatar
+            })
+        })
+        return {
+            "code": 200,
+            "message": "success",
+            "data": data
+        }
+    }
+
     async convertByte(size: number) {
         if (size >= 1024 * 1024) { // Nếu kích thước lớn hơn hoặc bằng 1 MB
             const sizeInMB = (size / (1024 * 1024)).toFixed(2); // Chuyển đổi thành MB với 2 chữ số thập phân
