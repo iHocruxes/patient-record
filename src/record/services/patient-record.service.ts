@@ -170,7 +170,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         const data = []
         records.forEach(e => {
             data.push({
-                uid: e.managerId,
+                id: e.id,
                 full_name: e.full_name,
                 avatar: e.avatar
             })
