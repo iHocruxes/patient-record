@@ -140,7 +140,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         if(records.length === 0)
             return {
                 code: 404,
-                message: "medical_record_not_found"
+                message: "user_not_found"
             }
 
         const data = []
@@ -188,7 +188,7 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         if(records.length === 0 || records.length !== ids.length)
             return {
                 code: 404,
-                message: "medical_record_not_found"
+                message: "patient_record_not_found"
             }
 
         const data = []
