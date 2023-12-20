@@ -46,4 +46,13 @@ export class PatientRecordConsumer {
     async findAllMedicalRecord(@RabbitPayload() ids: string[]): Promise<any> {
         return this.patientRecordService.findAllMedicalRecord(ids)
     }
+
+    @RabbitRPC({
+        exchange: 'healthline.user.information',
+        routingKey: 'patient',
+        queue: 'patient',
+    })
+    async findAllPatientRecord(@RabbitPayload() ids: string[]): Promise<any> {
+        return this.patientRecordService.findAllPatientRecord(ids)
+    }
 }
