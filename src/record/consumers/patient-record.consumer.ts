@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Inject, Injectable, Param, Post, Req, UseGuards } from "@nestjs/common"
 import { PatientRecordService } from "../services/patient-record.service"
-import { CloudinaryConsumer, PatientRecordtDto } from "../dtos/patient-record.dto"
+import { CloudinaryConsumer, FolderDto, PatientRecordtDto } from "../dtos/patient-record.dto"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager";
 import { RabbitPayload, RabbitRPC } from "@golevelup/nestjs-rabbitmq"
@@ -25,6 +25,17 @@ export class PatientRecordConsumer {
         dto.size = await this.patientRecordService.convertByte(cloudinary.data.bytes)
 
         const data = await this.patientRecordService.createPatientRecord(dto, cloudinary.user)
+        await this.cacheManager.del('patient-record-' + dto.medicalId)
+        return data 
+    }
+
+    @RabbitRPC({
+        exchange: 'healthline.upload.folder',
+        routingKey: 'folder', 
+        queue: 'folder',
+    })
+    async deleteFolder(dto: FolderDto): Promise<any> {
+        const data = await this.patientRecordService.deleteFolder(dto)
         await this.cacheManager.del('patient-record-' + dto.medicalId)
         return data 
     }

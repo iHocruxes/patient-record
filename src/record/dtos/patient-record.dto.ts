@@ -49,3 +49,15 @@ export class CloudinaryConsumer {
     folder: string
     medicalId: string
 }
+
+export class FolderDto {
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: 'default' })
+    folder: string
+
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: 'id' })
+    medicalId: string
+}

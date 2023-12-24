@@ -4,7 +4,7 @@ import { BadRequestException, ForbiddenException, Inject, Injectable, InternalSe
 import { InjectRepository } from "@nestjs/typeorm";
 import { MedicalRecord } from "../entities/medical-record.entity";
 import { In, Repository } from "typeorm";
-import { PatientRecordtDto } from "../dtos/patient-record.dto";
+import { FolderDto, PatientRecordtDto } from "../dtos/patient-record.dto";
 import { ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { AmqpConnection } from "@golevelup/nestjs-rabbitmq";
 @Injectable()
@@ -131,6 +131,24 @@ export class PatientRecordService extends BaseService<PatientRecord>{
         return {
             medicalId: record[0].medical.id,
             data: rabbit
+        }
+    }
+
+    async deleteFolder(dto: FolderDto) {
+        const records = await this.patientRecordRepository.find({ where: { folder: dto.folder, medical: { id: dto.medicalId } }, relations: ['medical'] })
+    
+        try {
+            await this.patientRecordRepository.remove(records)
+        } catch (error) {
+            return {
+                code: 400,
+                message: 'remove_patient_record_failed'
+            }
+        }
+
+        return {
+            code: 200,
+            message: 'success'
         }
     }
 
