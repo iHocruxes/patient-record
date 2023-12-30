@@ -56,6 +56,17 @@ export class PatientRecordService extends BaseService<PatientRecord>{
                 "code": 404,
                 "message": "medical_record_not_found",
             }
+
+        const patient = await this.patientRecordRepository.findOne({ where: { medical: { id: medical.id }, record: dto.record, folder: dto.folder }, relations: ['medical'] })
+        if(patient){
+            patient.size = dto.size
+            patient.updated_at = this.VNTime()
+            await this.patientRecordRepository.save(patient)
+            return {
+                "code": 201,
+                "message": "created"
+            }
+        }
         const record = new PatientRecord()
         record.medical = medical
         record.record = dto.record
