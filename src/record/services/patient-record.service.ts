@@ -201,6 +201,9 @@ export class PatientRecordService extends BaseService<PatientRecord>{
             data.push({
                 id: e.id,
                 full_name: e.full_name,
+                date_of_birth: e.date_of_birth,
+                gender: e.gender,
+                address: e.address,
                 avatar: e.avatar
             })
         })
